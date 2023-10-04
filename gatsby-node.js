@@ -8,7 +8,7 @@ const path = require(`path`)
 const { createFilePath } = require(`gatsby-source-filesystem`)
 
 // Define the template for blog post
-const blogPost = path.resolve(`./src/templates/blog-post.js`)
+const blogPost = path.resolve(`./src/templates/blog-post.tsx`)
 
 /**
  * @type {import('gatsby').GatsbyNode['createPages']}
@@ -79,6 +79,21 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
   }
 }
 
+exports.onCreateWebpackConfig = ({ getConfig, actions }) => {
+  const output = getConfig().output || {}
+
+  actions.setWebpackConfig({
+    output,
+    resolve: {
+      alias: {
+        components: path.resolve(__dirname, "src/components"),
+        utils: path.resolve(__dirname, "src/utils"),
+        hooks: path.resolve(__dirname, "src/hooks"),
+      },
+    },
+  })
+}
+
 /**
  * @type {import('gatsby').GatsbyNode['createSchemaCustomization']}
  */
@@ -122,4 +137,13 @@ exports.createSchemaCustomization = ({ actions }) => {
       slug: String
     }
   `)
+}
+
+exports.onCreateBabelConfig = ({ actions }) => {
+  actions.setBabelPlugin({
+    name: "@babel/plugin-transform-react-jsx",
+    options: {
+      runtime: "automatic",
+    },
+  })
 }
